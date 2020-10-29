@@ -45,7 +45,7 @@ RSpec.describe "Api::V1::Fastsprings", type: :request do
               "subtotalInPayoutCurrencyDisplay": "$9.99",
               "next": 1606348800000,
               "nextValue": 1606348800000,
-              "nextInSeconds": 1606348800,
+              "nextInSeconds": Faker::Date.between(from: 2.days.ago, to: 10.days.from_now).to_time(:utc).to_i,
               "nextDisplay": "11/26/20",
               "end": nil,
               "endValue": nil,
@@ -146,7 +146,7 @@ RSpec.describe "Api::V1::Fastsprings", type: :request do
                 }
               ],
               "importIdentifier": "IMPORT-Roland-#{DateTime.now.strftime('%m-%d-%y')}",
-              "customReferenceId": "18878-paypal"
+              "customReferenceId": Faker::IDNumber.south_african_id_number
             }
           }
         ]
@@ -154,25 +154,29 @@ RSpec.describe "Api::V1::Fastsprings", type: :request do
     end
 
     it 'POST with existing sub reconciliation' do
-      sub = Sub.create(
-        xsolla_id: Faker::IDNumber.south_african_id_number,
+      sub = Sub.create!(
+        xsolla_id: @body[:events][0][:data][:customReferenceId],
         active: true,
         state: 'active',
         term: 'monthly',
-        next_charge_date: Faker::Date.forward(days: 27),
+        next_charge_date: Faker::Date.between(from: 25.days.from_now, to: 1.month.from_now),
         product: 'xolla_bronze',
         product_display: 'XSolla Bronze'
       )
 
-      @body[:customReferenceId] = sub.xsolla_id
+      expect(@body[:events][0][:data][:customReferenceId]).to eq(sub.xsolla_id)
 
-      post '/api/v1/fastspring', params: @body.to_json, headers: { "CONTENT_TYPE" => "application/json" }
+      post '/api/v1/fastspring', params: @body.to_json, headers: { "CONTENT_TYPE": "application/json" }
 
+      # Request Tests
       expect(response).to be_successful
       expect(response.status).to eq(202)
+      expect(response.body).to be_a(String)
+      expect(response.body).to eq(@body[:events][0][:id])
 
-      webhook_response = JSON.parse(response.body)
-      expect(webhook_response).to be_a(String)
+      # Sub Reconciliation Tests
+      expect(sub).to be_a(Sub)
+      expect(sub.fs_id).to eq(@body[:events][0][:data][:id])
     end
   end
 end
