@@ -1,0 +1,31 @@
+<div class="titleContainer">
+  <h1>Subscription: <%= @sub.id %></h1>
+</div> 
+<div class="tableContainer">
+  <table>
+    <tr>
+      <th>XSolla ID</th>
+      <th>FastSpring ID</th>
+      <th>Product</th>
+      <th>Next Charge Date</th>
+      <th>Active?</th>
+      <th>State</th>
+      <th>FS Account ID</th>
+      <th>FS Import ID</th>
+    </tr>
+    <tr>
+      <td><%= @sub.xsolla_id %></td>
+      <td><%= @sub.fs_id %></td>
+      <td><%= @sub.product_display %></td>
+      <td><%= @sub.next_charge_date %></td>
+      <td><%= @sub.active %></td>
+      <td><%= @sub.state %></td>
+      <td><%= @sub.account_id %></td>
+      <td><%= @sub.import_id %></td>
+    </tr>
+  </table>
+</div>
+
+<div class="titleContainer">
+  <%= button_to 'Back', root_path, method: :get %>
+</div> 
