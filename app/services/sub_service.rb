@@ -2,7 +2,7 @@ class SubService
   def initialize(sub_event)
     @type = sub_event.fs_type
     @id = sub_event.fs_id
-    @sub_info = sub_event.data
+    @sub_info = sub_event.data.symbolize_keys
   end
 
   def eval_activation
@@ -14,7 +14,7 @@ class SubService
   end
 
   def activate_sub
-    return @id if Sub.create!(
+    return @id if Sub.create(
       fs_id: @sub_info[:subscription],
       active: @sub_info[:active],
       state: @sub_info[:state],
