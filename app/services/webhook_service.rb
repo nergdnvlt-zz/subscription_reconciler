@@ -7,10 +7,6 @@ class WebhookService
     { string: process_ids, status: 202 }
   end
 
-  # def process
-  #   EventService.new(@events).process_events
-  # end
-
   def initialize(request)
     @webhook = Webhook.create
     @events = create_events(request)
