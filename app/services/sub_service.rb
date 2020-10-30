@@ -46,8 +46,8 @@ class SubService
     )
   end
 
-  def sub_date_job
-    # Send request to update /sub with XSolla's new billing date
+  def sub_date_job(sub)
+    binding.pry
   end
 
   def save_rebilled_sub
