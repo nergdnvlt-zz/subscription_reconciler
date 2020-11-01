@@ -6,7 +6,7 @@ require 'faker'
     active: true,
     state: 'active',
     term: 'day',
-    next_charge_date: Faker::Date.forward(days: 27),
+    next_charge_date: "11/3/2020",
     product: 'xolla_bronze',
     product_display: 'XSolla Bronze'
   )
