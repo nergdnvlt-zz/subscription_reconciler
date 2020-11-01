@@ -5,7 +5,7 @@ require 'faker'
     xsolla_id: Faker::IDNumber.south_african_id_number,
     active: true,
     state: 'active',
-    term: 'monthly',
+    term: 'day',
     next_charge_date: Faker::Date.forward(days: 27),
     product: 'xolla_bronze',
     product_display: 'XSolla Bronze'
