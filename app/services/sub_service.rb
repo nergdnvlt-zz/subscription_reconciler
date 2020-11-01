@@ -3,6 +3,7 @@ class SubService
     @type = sub_event.fs_type
     @id = sub_event.fs_id
     @sub_info = sub_event.data.symbolize_keys
+    @sub = sub
   end
 
   def eval_activation
@@ -27,15 +28,51 @@ class SubService
   end
 
   def reconcile_sub
-    if sub.next_charge_date > seconds_to_date(@sub_info[:nextInSeconds])
-      sub_date_job(save_rebilled_sub)
+    if @sub.state == 'cancelled'
+      save_and_cancel_sub
+    elsif @sub.next_charge_date > seconds_to_date(@sub_info[:nextInSeconds])
+      sub_date_job
     else
       save_sub
     end
   end
 
-  def save_sub(sub)
-    sub.update(
+  def sub_date_job
+    return @id if FastspringService.new(save_rebilled_sub).post_sub_update
+  end
+
+  def save_rebilled_sub
+    @sub.update(
+      fs_id: @sub_info[:subscription],
+      active: @sub_info[:active],
+      state: @sub_info[:state],
+      term: @sub_info[:intervalUnit],
+      product: @sub_info[:product],
+      product_display: @sub_info[:display],
+      account_id: @sub_info[:account]
+    )
+    @sub.save
+    @sub
+  end
+
+  def save_and_cancel_sub
+    return @id if FastspringService.new(cancelled_sub).cancel_sub
+  end
+
+  def cancelled_sub
+    @sub.update(
+      fs_id: @sub_info[:subscription],
+      product: @sub_info[:product],
+      product_display: @sub_info[:display],
+      account_id: @sub_info[:account]
+    )
+    @sub.save
+    @sub
+  end
+
+  def save_sub
+    @sub.update(
+      fs_id: @sub_info[:subscription],
       active: @sub_info[:active],
       state: @sub_info[:state],
       term: @sub_info[:intervalUnit],
@@ -44,21 +81,7 @@ class SubService
       product_display: @sub_info[:display],
       account_id: @sub_info[:account]
     )
-  end
-
-  def sub_date_job(sub)
-    binding.pry
-  end
-
-  def save_rebilled_sub
-    @sub.update(
-      active: @sub_info[:active],
-      state: @sub_info[:state],
-      term: @sub_info[:intervalUnit],
-      product: @sub_info[:product],
-      product_display: @sub_info[:display],
-      account_id: @sub_info[:account]
-    )
+    return @id if @sub.save
   end
 
   def sub

@@ -12,21 +12,6 @@ class WebhookService
     @events = create_events(request)
   end
 
-  def create_events(request)
-    request[:events].map do |event|
-      Event.create(
-        webhook: @webhook,
-        fs_id: event[:id],
-        fs_type: event[:type],
-        data: event[:data]
-      )
-    end
-  end
-
-  def process_events
-    EventService.new(@events).process_all_events
-  end
-
   def process_ids
     response_string = ''
     process_events.each_with_index do |event, index|
@@ -36,5 +21,20 @@ class WebhookService
       end
     end
     response_string
+  end
+
+  def process_events
+    EventService.new(@events).process_all_events
+  end
+
+  def create_events(request)
+    request[:events].map do |event|
+      Event.create(
+        webhook: @webhook,
+        fs_id: event[:id],
+        fs_type: event[:type],
+        data: event[:data]
+      )
+    end
   end
 end
