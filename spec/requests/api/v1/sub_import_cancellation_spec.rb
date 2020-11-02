@@ -157,7 +157,7 @@ RSpec.describe "Api::V1::Fastsprings", type: :request do
       sub = Sub.create!(
         xsolla_id: @body[:events][0][:data][:customReferenceId],
         active: true,
-        state: 'cancelled',
+        state: 'canceled',
         term: 'monthly',
         next_charge_date: Faker::Date.between(from: 25.days.from_now, to: 1.month.from_now),
         product: 'xolla_bronze',

@@ -28,7 +28,7 @@ class SubService
   end
 
   def reconcile_sub
-    if @sub.state == 'cancelled'
+    if @sub.state == 'canceled'
       save_and_cancel_sub
     elsif @sub.next_charge_date > seconds_to_date(@sub_info[:nextInSeconds])
       sub_date_job
